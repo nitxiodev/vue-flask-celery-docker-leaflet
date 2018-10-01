@@ -1,0 +1,11 @@
+---
+- name: Add pip and other utilities
+  apt: name={{item}} state=latest
+  with_items:
+    - wget
+    - curl
+    - tar
+    - unzip
+    - gcc
+    - python-pip
+    - virtualenv

@@ -1,0 +1,83 @@
+version: '3'
+
+services:
+  reverse-proxy:
+    image: traefik # The official Traefik docker image
+    command: --api --docker # Enables the web UI and tells Træfik to listen to docker
+    restart: always
+    ports:
+      - "80:80"     # The HTTP port
+      - "8080:8080" # The Web UI (enabled by --api)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+    labels:
+      - "traefik.enable=false"
+
+  celery-long-running:
+    build:
+      context: .
+      dockerfile: ./celery/Dockerfile
+    command: celery -A csp_solver_cloud.src.server.flask_server.celery worker --loglevel=info -Ofair -Q long_running -c 4  # concurrency
+    restart: always
+    depends_on:
+     - redis
+
+  celery-short-running:
+    build:
+      context: .
+      dockerfile: ./celery/Dockerfile
+    command: celery -A csp_solver_cloud.src.server.flask_server.celery worker --loglevel=info -Ofair -Q short_running -c 2  # concurrency
+    restart: always
+    depends_on:
+     - redis
+
+  flaskserver:
+    build:
+      context: .
+      dockerfile: ./flask_server/Dockerfile
+    restart: always
+    labels:
+    - "traefik.enable=true"
+    - "traefik.backend=flaskserver"
+    - "traefik.frontend.rule=Host:flaskserver.docker"
+    - "traefik.backend.loadbalancer.method=drr"
+    depends_on:
+     - celery-long-running
+     - celery-short-running
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    labels:
+     - "traefik.enable=false"
+    restart: always
+
+  frontend:
+    build:
+     context: .
+     dockerfile: ./web/Dockerfile
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=frontend"
+      - "traefik.frontend.rule=Host:frontend.docker"
+      - "traefik.backend.loadbalancer.method=drr"
+    depends_on:
+     - flaskserver
+     - socketio
+
+  socketio:
+   build:
+    context: .
+    dockerfile: ./flask_socketio_server/Dockerfile
+   restart: always
+   labels:
+    - "traefik.enable=true"
+    - "traefik.backend=flasksocketio"
+    - "traefik.frontend.rule=Host:flasksocketio.docker"
+    - "traefik.backend.loadbalancer.stickiness=true"
+    - "traefik.backend.loadbalancer.method=drr"
+   depends_on:
+    - redis
+    - celery-long-running
+    - celery-short-running

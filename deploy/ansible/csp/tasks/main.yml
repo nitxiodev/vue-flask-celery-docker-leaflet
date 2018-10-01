@@ -1,0 +1,33 @@
+- name: Download the entire project
+  git: repo='https://github.com/nitxiodev/vue-flask-celery-docker-leaflet.git' dest=/tmp/repo
+
+- name: Stat to countdown_backend
+  stat: path=/opt/csp_solver_cloud
+  register: backend
+
+- name: Stat to frontend
+  stat: path=/opt/csp-frontend
+  register: frontend
+
+- name: Move backend to /opt
+  shell: mv /tmp/repo/csp_solver_cloud /opt/
+  when: backend.stat.exists == False
+
+- name: Move frontend to /opt
+  shell: mv /tmp/repo/csp-frontend /opt/
+  when: frontend.stat.exists == False
+
+- name: Clean tmp/repo directory
+  file: state=absent path=/tmp/repo
+
+- name: Add dockerfiles to Virtual Machine
+  copy: src={{item}} dest=/opt/ owner="{{ansible_env.SUDO_USER}}" group="{{ansible_env.SUDO_USER}}" mode=0600
+  with_items:
+    - celery
+    - flask_server
+    - flask_socketio_server
+    - web
+    - docker-compose.yml
+
+- name: Install app on virtual machine using docker-compose
+  shell: cd /opt && docker-compose up -d

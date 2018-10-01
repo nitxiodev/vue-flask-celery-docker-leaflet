@@ -1,0 +1,38 @@
+---
+# RUN: ansible-playbook -i hosts -u root playbook.yml
+- name: Install Python2.7
+  hosts: local
+  gather_facts: false
+  become: True
+  become_user: root
+  pre_tasks:
+    - name: Install python for Ansible
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      register: output
+      changed_when: output.stdout != ""
+    - name: Gathering Facts
+      setup:
+
+- name: Install utilities
+  hosts: local
+  become: True
+  become_user: root
+
+  roles:
+    - { role: utils, tags: ["utils"] }
+
+- name: Install docker
+  hosts: local
+  become: True
+  become_user: root
+
+  roles:
+    - { role: docker, tags: ["docker"] }
+
+- name: Deploy app
+  hosts: local
+  become: True
+  become_user: root
+
+  roles:
+    - { role: csp, tags: ["csp"] }

@@ -1,0 +1,23 @@
+---
+- name: Packages to use a repository over https
+  apt: name={{item}} update_cache=yes state=present
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+
+- name: Add docker GPG key
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+- name: Add repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+
+- name: Install docker
+  apt: name=docker-ce update_cache=yes state=latest
+  notify:
+    - Start Docker
+
+- name: Install docker-compose
+  pip: name=docker-compose state=latest

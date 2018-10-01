@@ -1,0 +1,4 @@
+.idea
+*.pyc
+csp-frontend/README.md
+.vagrant
