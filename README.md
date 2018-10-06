@@ -45,4 +45,12 @@ Endpoints exposed by traeffik require a domain name, so the IP address of the ma
 192.168.33.20 flaskserver.docker frontend.docker flasksocketio.docker
 ```
 
+# Notes
+In order to support map tasks, this application uses the following external services:
+- In the backend side, a reverse geocoding system with Photon (limited service) and/or ArcGIS (full service) is used. In the first case, its terms of use indicate that *"You can use the API for your project, but please **be fair** - extensive usage will be throttled. We do not guarantee for the availability and usage might be subject of change in the future."*, whereas in the second one, *"(...) If you merely view the results of these operations on a map and discard them immediately afterward, you can use these operations free of charge. However, if you store the results, in a database for instance, these operations require a subscription"*. 
+- On the other hand, in the frontend side, a free geolocation service is used (ip-api).
+
+**Therefore, please respect their conditions and terms of use.**
+
+
 ### Work in progress....
