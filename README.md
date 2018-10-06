@@ -1,3 +1,5 @@
+# Work in progress....
+
 # vue-flask-celery-docker-leaflet
 Dockerized client-server application of Constraint Satisfaction Problems using Flask, Websockets, Celery, Vue and Leaflet.
 
@@ -51,6 +53,3 @@ In order to support map tasks, this application uses the following external serv
 - On the other hand, in the frontend side, a free geolocation service is used (ip-api).
 
 **Therefore, please respect their conditions and terms of use.**
-
-
-### Work in progress....
