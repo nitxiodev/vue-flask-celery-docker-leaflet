@@ -46,7 +46,7 @@ Endpoints exposed by traeffik require a domain name, so the IP address of the ma
 ```bash
 192.168.33.20 flaskserver.docker frontend.docker flasksocketio.docker
 ```
-The default configuration is the recommended one to deploy the application. However, it is possible to modify certain parameters on both sides.
+**The default configuration is the recommended one to deploy the application**. However, it is possible to modify certain parameters on both sides.
 
 ### Backend configuration
 In [flask_inits.py](csp_solver_cloud/src/server/flask_inits.py#L33-L34), you can choose two parameters:
@@ -58,6 +58,38 @@ In [config.py](csp_solver_cloud/src/server/config.py), it is recommended to modi
 ### Frontend configuration
 In [config.json](csp-frontend/static/config.json), you can change the url for dockerized services. If you change one of these url, you **must** update accordingly the **traeffik frontend rules** in [docker-compose.yml](deploy/ansible/csp/files/docker-compose.yml) file and hosts in `/etc/hosts`.
 
+### Usage - MapView (default view)
+Once you have configured hosts, open Firefox or Chrome/Chromium browser and type on a tab/window: http://frontend.docker. If all went well, you should see the following image:
+
+<p align="center">
+  <img src="./img/frontpage.png" width="90%">
+</p>
+
+When the site loads, it will try to geoposition your IP on the map. After that, you can click with the mouse on any country around the world to solve the constraint satisfaction problem. If all went well, guessing that you has clicked in Spain, you will see something similar to the following image:
+
+<p align="center">
+  <img src="./img/frontpage_geojson.png" width="90%">
+</p>
+
+When you has a `GeoJSON` layer on the map (i.e. one solution), you can hide the tilemap in order to see only the solution:
+
+<p align="center">
+  <img src="./img/frontpage_geojsononly.png" width="90%">
+</p>
+
+### Usage - SudokuView
+If you type on a tab/window: http://frontend.docker/#/sudoku, you should see the following image:
+
+<p align="center">
+  <img src="./img/sudoku.png" width="90%">
+</p>
+
+When this view loads, you can fill the grid manually, randomly (choosing a difficulty level) or via a string. For example, if we upload the following sudoku: `590000060070060501000000000000018024908004600000600018040309080350100246080200000` and solve it, we well see the following image:
+
+<p align="center">
+  <img src="./img/sudoku_solved.png" width="90%">
+</p>
+
 ## Scaling services
 One of the advantages of deploying the services in docker, is the ease with which we can scale them. To do this, enter the following commands on a terminal: 
 
@@ -66,7 +98,13 @@ One of the advantages of deploying the services in docker, is the ease with whic
 ubuntu@numbersDeploy:~$  cd /opt
 ubuntu@numbersDeploy:~$ sudo docker-compose up -d --scale flaskserver=2 --scale frontend=2 --scale socketio=2 # we are scaling the api rest server 2 times, nginx server (frontend) 2 times, and socketio server 2 times in a round-robin fashion.
 ```
-If you go to `192.168.33.20:8080` and see the Traeffik Dashboard, you will see in the backends part, the 6 new services! However, due to the virtual machine resource constraints, it can be exhausted. For this reason, it is recommended to be careful when scaling services.
+If you go to `192.168.33.20:8080` and see the Traeffik Dashboard, you will see in the backends part, the 6 new services!
+
+<p align="center">
+  <img src="./img/dashboard.png" width="90%">
+</p>
+
+However, due to the virtual machine resource constraints, it can be exhausted. For this reason, it is recommended to be careful when scaling services.
 
 # Notes
 In order to support map tasks, this application uses the following external services:
