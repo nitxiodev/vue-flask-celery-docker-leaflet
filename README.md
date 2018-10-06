@@ -46,6 +46,17 @@ Endpoints exposed by traeffik require a domain name, so the IP address of the ma
 ```bash
 192.168.33.20 flaskserver.docker frontend.docker flasksocketio.docker
 ```
+The default configuration is the recommended one to deploy the application. However, it is possible to modify certain parameters on both sides.
+
+### Backend configuration
+In [flask_inits.py](csp_solver_cloud/src/server/flask_inits.py#L33-L34), you can choose two parameters:
+- **BOOST**: spawn a new green thread in every request. Enables the endpoint to accept more requests per second.
+- **GEOCODER**: choose the reverse geocoding engine. Options are shown in comments.
+- The rest of the parameters are recommended as they are.
+In [config.py](csp_solver_cloud/src/server/config.py), it is recommended to modify just the following keys in ProductionConfig:
+- **CELERY_TASK_RESULT_EXPIRES**: choose the time (in seconds, or a timedelta object) for when after stored task tombstones will be deleted.
+### Frontend configuration
+In [config.json](csp-frontend/static/config.json), you can change the url for dockerized services. If you change one of these url, you **must** update accordingly the **traeffik frontend rules** in [docker-compose.yml](deploy/ansible/csp/files/docker-compose.yml) file and hosts in `/etc/hosts`.
 
 # Notes
 In order to support map tasks, this application uses the following external services:
