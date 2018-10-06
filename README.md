@@ -58,6 +58,16 @@ In [config.py](csp_solver_cloud/src/server/config.py), it is recommended to modi
 ### Frontend configuration
 In [config.json](csp-frontend/static/config.json), you can change the url for dockerized services. If you change one of these url, you **must** update accordingly the **traeffik frontend rules** in [docker-compose.yml](deploy/ansible/csp/files/docker-compose.yml) file and hosts in `/etc/hosts`.
 
+## Scaling services
+One of the advantages of deploying the services in docker, is the ease with which we can scale them. To do this, enter the following commands on a terminal: 
+
+```bash
+/deploy$ vagrant ssh # enter to virtual machine (this command is executed on the host machine)
+ubuntu@numbersDeploy:~$  cd /opt
+ubuntu@numbersDeploy:~$ sudo docker-compose up -d --scale flaskserver=2 --scale frontend=2 --scale socketio=2 # we are scaling the api rest server 2 times, nginx server (frontend) 2 times, and socketio server 2 times in a round-robin fashion.
+```
+If you go to `192.168.33.20:8080` and see the Traeffik Dashboard, you will see in the backends part, the 6 new services! However, due to the virtual machine resource constraints, it can be exhausted. For this reason, it is recommended to be careful when scaling services.
+
 # Notes
 In order to support map tasks, this application uses the following external services:
 - In the backend side, a reverse geocoding system with Photon (limited service) and/or ArcGIS (full service) is used. In the first case, its terms of use indicate that *"You can use the API for your project, but please **be fair** - extensive usage will be throttled. We do not guarantee for the availability and usage might be subject of change in the future."*, whereas in the second one, *"(...) If you merely view the results of these operations on a map and discard them immediately afterward, you can use these operations free of charge. However, if you store the results, in a database for instance, these operations require a subscription"*. 
