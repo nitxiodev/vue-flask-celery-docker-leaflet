@@ -52,7 +52,7 @@ In [flask_inits.py](csp_solver_cloud/src/server/flask_inits.py#L33-L34), you can
 - **GEOCODER**: choose the reverse geocoding engine. Options are shown in comments.
 - The rest of the parameters are recommended as they are.
 In [config.py](csp_solver_cloud/src/server/config.py), it is recommended to modify just the following keys in ProductionConfig:
-- **CELERY_TASK_RESULT_EXPIRES**: choose the time (in seconds, or a timedelta object) for when after stored task tombstones will be deleted.
+  - **CELERY_TASK_RESULT_EXPIRES**: choose the time (in seconds, or a timedelta object) for when after stored task tombstones will be deleted.
 ### Frontend configuration
 In [config.json](csp-frontend/static/config.json), you can change the url for dockerized services. If you change one of these url, you **must** update accordingly the **traeffik frontend rules** in [docker-compose.yml](deploy/ansible/csp/files/docker-compose.yml) file and hosts in `/etc/hosts`.
 
